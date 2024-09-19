@@ -1,0 +1,42 @@
+import pandas as pd
+import datetime as dt
+from tabula import read_pdf
+
+file = r""  # update the address to pdf file inside " "
+csv_folder = r""  # update the address of folder where you want to save file inside " ".
+pw = ""  # update the password of pdf file
+
+# reads table from pdf file
+tables = read_pdf(file, pages="all", multiple_tables=True, password=pw)
+
+st1 = tables[2]  # page 1
+st2 = tables[3]  # page 2
+
+
+# function to clean dataframe
+
+def clean_df(df):
+    # rename columns
+    df = df.rename(columns={
+        df.columns[0]: 'date',
+        df.columns[1]: 'transaction description',
+        df.columns[4]: 'amount'
+    })
+
+    # clean
+    df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
+    df = df.dropna(subset=['date'])
+    df = df[['date', 'amount', 'transaction description']]
+    df['amount'] = df['amount'].str.replace(',', '')
+    df['amount'] = df['amount'].apply(lambda x: float(x.replace('Cr', '').strip()) if 'Cr' in x else float(x) * -1)
+    df['date'] = pd.to_datetime(df.date).dt.date
+
+    return df
+
+
+st1 = clean_df(st1)
+st2 = clean_df(st2)
+
+df_f = pd.concat([st1, st2], axis=0)
+
+df_f.to_csv(csv_folder + '\hdfc_cc_statement.csv', index = False)
