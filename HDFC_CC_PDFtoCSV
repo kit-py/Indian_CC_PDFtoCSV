@@ -3,7 +3,7 @@ import datetime as dt
 from tabula import read_pdf
 
 file = r""  # update the address to pdf file inside " "
-csv_folder = r""  # update the address of folder where you want to save file inside " ".
+csv_folder = r""  # update the address of folder where you want to save file inside " "
 pw = ""  # update the password of pdf file
 
 # reads table from pdf file
